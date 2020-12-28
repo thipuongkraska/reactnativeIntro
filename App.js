@@ -1,21 +1,52 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, {useState} from 'react';
+import { StyleSheet, View, FlatList, Button} from 'react-native';
+import Input from "./components/Input";
+import ShowInput from "./components/ShowInput";
 
 export default function App() {
+  const [inputValue, setInputValue] = useState("");
+  const [textInput, setTextInput] = useState([]);
+  const [visibility, setVisibility] = useState(false);
+  const handlerChangeInput = (event) => {
+    setInputValue(event);
+  }
+  const handlerSubmit = () => {
+    setTextInput(currentText => [...currentText, {id: Math.random().toString(), value: inputValue}]);
+    setVisibility(false);
+    setInputValue("");
+  }
+  const handlerRemove = (id) => {
+    setTextInput(currentText => {
+      return currentText.filter((goal) => goal.id !== id)
+    });
+  }
+  const visibleHandler = () => {
+    setVisibility(true);
+  }
+  const handlerCancel = () => {
+    setVisibility(false);
+  }
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <Input 
+      visible={visibility} 
+      functionInput={handlerChangeInput} 
+      functionSubmit={handlerSubmit}
+      functionCancel={handlerCancel}
+      value={inputValue} />
+      <Button title="Add" onPress={visibleHandler}/>
+      <FlatList 
+      data={textInput}
+      renderItem={
+        i => 
+      <ShowInput id={i.item.id} onRemove={handlerRemove} value={i.item.value}/>
+      } />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 50,
   },
 });
